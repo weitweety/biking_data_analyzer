@@ -93,55 +93,82 @@ def validate_numeric_value(value: Any) -> float:
 
 def transform_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Transform the extracted dataframe
+    Transform the extracted dataframe for Citi Bike trips.
+    - Renames columns to snake_case
+    - Parses datetimes
+    - Coerces numeric types and handles nulls
     
     Args:
         df: Input dataframe
         
     Returns:
-        pd.DataFrame: Transformed dataframe
+        pd.DataFrame: Transformed dataframe ready for loading into bike_trips
     """
     try:
         logger.info(f"Starting transformation of {len(df)} records")
-        
-        # Create a copy to avoid modifying the original
-        transformed_df = df.copy()
-        
-        # Clean and normalize text columns
-        if 'name' in transformed_df.columns:
-            transformed_df['name'] = transformed_df['name'].apply(clean_text)
-        
-        if 'description' in transformed_df.columns:
-            transformed_df['description'] = transformed_df['description'].apply(clean_text)
-        
-        # Normalize category
-        if 'category' in transformed_df.columns:
-            transformed_df['category'] = transformed_df['category'].apply(normalize_category)
-        else:
-            # If no category column, create one
-            transformed_df['category'] = 'General'
-        
-        # Validate and clean numeric values
-        if 'value' in transformed_df.columns:
-            transformed_df['value'] = transformed_df['value'].apply(validate_numeric_value)
-        else:
-            # If no value column, create one with default values
-            transformed_df['value'] = 1.0
-        
-        # Remove duplicates based on name and category
-        initial_count = len(transformed_df)
-        transformed_df = transformed_df.drop_duplicates(subset=['name', 'category'], keep='first')
-        final_count = len(transformed_df)
-        
-        if initial_count != final_count:
-            logger.info(f"Removed {initial_count - final_count} duplicate records")
-        
-        # Sort by value descending
-        transformed_df = transformed_df.sort_values('value', ascending=False)
-        
+
+        rename_map = {
+            'tripduration': 'tripduration',
+            'starttime': 'start_time',
+            'stoptime': 'stop_time',
+            'start station id': 'start_station_id',
+            'start station name': 'start_station_name',
+            'start station latitude': 'start_station_latitude',
+            'start station longitude': 'start_station_longitude',
+            'end station id': 'end_station_id',
+            'end station name': 'end_station_name',
+            'end station latitude': 'end_station_latitude',
+            'end station longitude': 'end_station_longitude',
+            'bikeid': 'bike_id',
+            'usertype': 'user_type',
+            'birth year': 'birth_year',
+            'gender': 'gender',
+        }
+
+        # Lowercase columns to match keys in rename_map
+        df_columns_lower = {c: c.lower() for c in df.columns}
+        df = df.rename(columns=df_columns_lower)
+
+        # Rename to snake_case names
+        transformed_df = df.rename(columns=rename_map)
+
+        # Keep only expected columns
+        expected_cols = list(rename_map.values())
+        transformed_df = transformed_df[[c for c in expected_cols if c in transformed_df.columns]]
+
+        # Parse datetimes
+        for dt_col in ['start_time', 'stop_time']:
+            if dt_col in transformed_df.columns:
+                transformed_df[dt_col] = pd.to_datetime(transformed_df[dt_col], errors='coerce')
+
+        # Coerce numeric fields
+        int_cols = ['tripduration', 'start_station_id', 'end_station_id', 'bike_id', 'birth_year', 'gender']
+        float_cols = ['start_station_latitude', 'start_station_longitude', 'end_station_latitude', 'end_station_longitude']
+
+        for col in int_cols:
+            if col in transformed_df.columns:
+                transformed_df[col] = pd.to_numeric(transformed_df[col], errors='coerce').astype('Int64')
+
+        for col in float_cols:
+            if col in transformed_df.columns:
+                transformed_df[col] = pd.to_numeric(transformed_df[col], errors='coerce')
+
+        # Clean text columns
+        text_cols = ['start_station_name', 'end_station_name', 'user_type']
+        for col in text_cols:
+            if col in transformed_df.columns:
+                transformed_df[col] = transformed_df[col].apply(clean_text)
+
+        # Drop rows missing essential datetimes or duration
+        essential = ['tripduration', 'start_time', 'stop_time']
+        missing_before = transformed_df.shape[0]
+        transformed_df = transformed_df.dropna(subset=[c for c in essential if c in transformed_df.columns])
+        missing_after = transformed_df.shape[0]
+        if missing_before != missing_after:
+            logger.info(f"Dropped {missing_before - missing_after} rows with missing essential fields")
+
         logger.info(f"Transformation completed. Final record count: {len(transformed_df)}")
         return transformed_df
-        
     except Exception as e:
         logger.error(f"Error during transformation: {str(e)}")
         raise

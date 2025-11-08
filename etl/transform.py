@@ -26,39 +26,6 @@ def clean_text(text: str) -> str:
     
     return text
 
-def normalize_category(category: str) -> str:
-    """
-    Normalize category names
-    
-    Args:
-        category: Category name to normalize
-        
-    Returns:
-        str: Normalized category name
-    """
-    if pd.isna(category) or category is None:
-        return "Unknown"
-    
-    category = str(category).strip().lower()
-    
-    # Common category mappings
-    category_mappings = {
-        'tech': 'Technology',
-        'techology': 'Technology',
-        'it': 'Technology',
-        'finance': 'Financial',
-        'fin': 'Financial',
-        'health': 'Healthcare',
-        'healthcare': 'Healthcare',
-        'edu': 'Education',
-        'education': 'Education',
-        'retail': 'Retail',
-        'ecommerce': 'E-commerce',
-        'e-commerce': 'E-commerce'
-    }
-    
-    return category_mappings.get(category, category.title())
-
 def validate_numeric_value(value: Any) -> float:
     """
     Validate and convert numeric values
@@ -171,31 +138,4 @@ def transform_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         return transformed_df
     except Exception as e:
         logger.error(f"Error during transformation: {str(e)}")
-        raise
-
-def aggregate_data(df: pd.DataFrame) -> Dict[str, Any]:
-    """
-    Create aggregated statistics from the dataframe
-    
-    Args:
-        df: Input dataframe
-        
-    Returns:
-        Dict[str, Any]: Aggregated statistics
-    """
-    try:
-        stats = {
-            'total_records': len(df),
-            'categories': df['category'].value_counts().to_dict(),
-            'average_value': df['value'].mean(),
-            'max_value': df['value'].max(),
-            'min_value': df['value'].min(),
-            'total_value': df['value'].sum()
-        }
-        
-        logger.info(f"Aggregated statistics: {stats}")
-        return stats
-        
-    except Exception as e:
-        logger.error(f"Error creating aggregated statistics: {str(e)}")
         raise

@@ -27,23 +27,6 @@ def get_summary_stats(db: Session):
     """Get summary statistics"""
     total_records = db.query(models.BikeTrip).count()
     
-    '''
-    # Get category counts
-    category_stats = db.query(
-        models.DataRecord.category,
-        func.count(models.DataRecord.id).label('count')
-    ).group_by(models.DataRecord.category).all()
-    
-    categories = {stat.category: stat.count for stat in category_stats}
-    
-    # Get average value
-    avg_result = db.query(func.avg(models.DataRecord.value)).scalar()
-    average_value = float(avg_result) if avg_result else 0.0
-    
-    # Get last updated timestamp
-    last_record = db.query(models.DataRecord).order_by(desc(models.DataRecord.updated_at)).first()
-    last_updated = last_record.updated_at if last_record else None
-    '''
     return {
         "total_records": total_records
     }

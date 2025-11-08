@@ -64,7 +64,7 @@ async def get_top_n(n: int, db: Session = Depends(get_db)):
         logger.error(f"Error getting top {n} records: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to get top records")
 
-@app.get("/records", response_model=List[schemas.DataRecord])
+@app.get("/records", response_model=List[schemas.BikeTrip])
 async def get_records(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Get all records with pagination"""
     if limit > 1000:

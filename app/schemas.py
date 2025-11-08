@@ -2,32 +2,6 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional, List
 
-# Existing DataRecord schemas retained for current API compatibility
-class DataRecordBase(BaseModel):
-    name: str
-    category: str
-    value: float
-    description: Optional[str] = None
-
-class DataRecordCreate(DataRecordBase):
-    pass
-
-class DataRecord(DataRecordBase):
-    id: int
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-    
-    class Config:
-        from_attributes = True
-
-class SummaryResponse(BaseModel):
-    total_records: int
-
-class TopNResponse(BaseModel):
-    records: List[DataRecord]
-    count: int
-
-
 class BikeTripBase(BaseModel):
     tripduration: int
     start_time: datetime
@@ -55,3 +29,10 @@ class BikeTrip(BikeTripBase):
 
     class Config:
         from_attributes = True
+
+class SummaryResponse(BaseModel):
+    total_records: int
+
+class TopNResponse(BaseModel):
+    records: List[BikeTrip]
+    count: int

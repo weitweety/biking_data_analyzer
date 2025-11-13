@@ -44,6 +44,7 @@ services:
       - ./etl:/opt/airflow/etl
       - ./app:/opt/airflow/app
       - ./data:/opt/airflow/data
+      - ./processed:/opt/airflow/processed
     depends_on:
       - postgres
     networks:
@@ -77,6 +78,7 @@ services:
       - ./etl:/opt/airflow/etl
       - ./app:/opt/airflow/app
       - ./data:/opt/airflow/data
+      - ./processed:/opt/airflow/processed
     depends_on:
       - airflow-init
     networks:
@@ -106,6 +108,7 @@ services:
       - ./etl:/opt/airflow/etl
       - ./app:/opt/airflow/app
       - ./data:/opt/airflow/data
+      - ./processed:/opt/airflow/processed
     depends_on:
       - airflow-init
     networks:

@@ -34,11 +34,15 @@ dag = DAG(
     tags=['etl', 'dataflowhub'],
 )
 
+# Define the data directory path
+data_dir = os.path.join(project_root, 'data')
+
+# Define the processed directory path
+processed_dir = os.path.join(project_root, 'processed')
+
 def extract_task():
     """Extract data from CSV files"""
     try:
-        # Define the data directory path
-        data_dir = os.path.join(project_root, 'data')
         
         # Create data directory if it doesn't exist
         os.makedirs(data_dir, exist_ok=True)
@@ -91,7 +95,7 @@ def load_task(**context):
             raise Exception("Database connection validation failed")
         
         # Load data to database
-        success = load_to_database(df, clear_existing=True)
+        success = load_to_database(df, clear_existing=False)
         
         if success:
             print("Successfully loaded data into database")
@@ -127,6 +131,12 @@ load_data = PythonOperator(
     dag=dag,
 )
 
+move_to_processed = BashOperator(
+    task_id='move_to_processed',
+    bash_command=f'mv {data_dir}/*.csv {processed_dir}',
+    dag=dag,
+)
+
 # Define task dependencies
-validate_db >> extract_data >> transform_data >> load_data
+validate_db >> extract_data >> transform_data >> load_data >> move_to_processed
 

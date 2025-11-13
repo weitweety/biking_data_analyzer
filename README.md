@@ -1,6 +1,7 @@
 # Biking Data Analyzer
 
-A comprehensive data flow management system built with Python, FastAPI, PostgreSQL, and Apache Airflow. This application provides ETL capabilities with a RESTful API for data management and monitoring.
+A comprehensive biking data flow management system built with Python, FastAPI, PostgreSQL, and Apache Airflow. (With the help from Cursor AI assistance).
+This application provides ETL capabilities with a RESTful API for data management and monitoring.
 
 ## Architecture
 
@@ -25,7 +26,8 @@ biking_data_analyzer/
 │   ├── transform.py          # Data transformation
 │   └── load.py               # Data loading to PostgreSQL
 │
-├── data/                     # Sample CSV data files
+├── data/                     # CSV data files to be processed
+├── processed/                # processed CSV data files
 ├── docker-compose.yml        # Main Docker Compose configuration
 ├── Dockerfile.api            # API Docker image
 ├── requirements.txt          # Python dependencies
@@ -59,18 +61,27 @@ The ETL pipeline processes CSV files through three stages:
 1. **Extract**: Reads CSV files from the `data/` directory
 2. **Transform**: Cleans, normalizes, and validates the data
 3. **Load**: Stores the processed data in PostgreSQL
+4. **Move**: Move the processed csv files from `data/` to `processed/`
 
 ### Data Model
 
 The application uses a simple data model with the following fields:
 
-- `id`: Primary key
-- `name`: Record name
-- `category`: Data category
-- `value`: Numeric value
-- `description`: Optional description
-- `created_at`: Timestamp when record was created
-- `updated_at`: Timestamp when record was last updated
+- tripduration: int
+- start_time: datetime
+- stop_time: datetime
+- start_station_id: Optional[int]
+- start_station_name: Optional[str]
+- start_station_latitude: Optional[float]
+- start_station_longitude: Optional[float]
+- end_station_id: Optional[int]
+- end_station_name: Optional[str]
+- end_station_latitude: Optional[float]
+- end_station_longitude: Optional[float]
+- bike_id: Optional[int]
+- user_type: Optional[str]
+- birth_year: Optional[int]
+- gender: Optional[int]
 
 ## Quick Start
 
@@ -179,19 +190,26 @@ Access the Airflow web interface at http://localhost:8080 with the following cre
 
 The ETL pipeline (`etl_pipeline`) will be available in the DAGs list and can be triggered manually or will run automatically every hour.
 
-## Sample Data
+## Data
 
-The `data/` directory contains sample CSV files:
+In this project we use the data from [Citi Bike](https://citibikenyc.com/system-data)
 
-- `sample_data.csv` - General company data
-- `financial_data.csv` - Financial services companies
-- `healthcare_data.csv` - Healthcare companies
-
+The `data/` directory contains input CSV files.
 Each CSV file should have the following columns:
-- `name`: Company or entity name
-- `category`: Data category
-- `value`: Numeric value
-- `description`: Description of the entity
+"tripduration"
+"starttime"
+"stoptime"
+"start station id"
+"start station name"
+"start station latitude"
+"start station longitude"
+"end station id"
+"end station name"
+"end station latitude"
+"end station longitude"
+"bikeid","usertype"
+"birth year","gender"
+
 
 ## ETL Pipeline Details
 
@@ -203,9 +221,6 @@ Each CSV file should have the following columns:
 ### Transform Phase
 - Cleans and normalizes text data
 - Validates and converts numeric values
-- Normalizes category names
-- Removes duplicate records
-- Sorts data by value (descending)
 
 ### Load Phase
 - Validates database connection

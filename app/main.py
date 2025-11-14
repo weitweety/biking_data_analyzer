@@ -35,6 +35,16 @@ async def get_summary(db: Session = Depends(get_db)):
         logger.error(f"Error getting summary: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to get summary statistics")
 
+@app.get("/trip-duration-stats", response_model=schemas.TripDurationStatsResponse)
+async def get_trip_duration_stats(db: Session = Depends(get_db)):
+    """Get trip duration statistics"""
+    try:
+        stats = crud.get_trip_duration_stats(db)
+        return schemas.TripDurationStatsResponse(**stats)
+    except Exception as e:
+        logger.error(f"Error getting trip duration statistics: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get trip duration statistics")
+
 @app.post("/refresh")
 async def refresh_data():
     """Trigger the ETL pipeline manually"""

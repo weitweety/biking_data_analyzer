@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, select
 import models, schemas
 from typing import List, Optional
 
@@ -29,6 +29,26 @@ def get_summary_stats(db: Session):
     
     return {
         "total_records": total_records
+    }
+
+def get_trip_duration_stats(db: Session):
+    """Get trip duration statistics"""
+    stmt = (
+        select(
+            (models.BikeTrip.tripduration // 3600).label("hours"),
+            func.count().label("count")
+        ).group_by(
+            "hours"
+        ).order_by(
+            "hours"
+        )
+    )
+
+    rows = db.execute(stmt).all()
+
+    return {
+        "hours": [row.hours for row in rows],
+        "count": [row.count for row in rows]
     }
 
 def delete_all_records(db: Session):

@@ -36,3 +36,7 @@ class SummaryResponse(BaseModel):
 class TopNResponse(BaseModel):
     records: List[BikeTrip]
     count: int
+
+class TripDurationStatsResponse(BaseModel):
+    hours: List[float]
+    count: List[int]

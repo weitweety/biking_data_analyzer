@@ -143,6 +143,18 @@ services:
       - ./app:/app
       - ./etl:/etl
 
+  frontend:
+    build:
+      context: ../biking-frontend
+      dockerfile: Dockerfile
+    container_name: dataflowhub_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    networks:
+      - dataflowhub_network
+
 volumes:
   postgres_data:
 

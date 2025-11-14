@@ -13,6 +13,11 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - dataflowhub_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   airflow-init:
     image: apache/airflow:2.7.3
@@ -46,7 +51,8 @@ services:
       - ./data:/opt/airflow/data
       - ./processed:/opt/airflow/processed
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - dataflowhub_network
 
@@ -127,8 +133,10 @@ services:
       AIRFLOW_USERNAME: admin
       AIRFLOW_PASSWORD: admin
     depends_on:
-      - postgres
-      - airflow-webserver
+      postgres:
+        condition: service_healthy
+      airflow-webserver:
+        condition: service_started
     networks:
       - dataflowhub_network
     volumes:

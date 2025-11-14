@@ -1,6 +1,6 @@
 airflow/logs/*
-data/*
-processed/*
+biking-backend/data/*
+biking-backend/processed/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

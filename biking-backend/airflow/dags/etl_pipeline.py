@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
 import os
 import sys
+import glob
+import shutil
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from airflow.operators.bash import BashOperator
 
 # Add the project root to Python path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -51,11 +52,11 @@ def extract_task():
         dataframes = extract_multiple_csvs(data_dir)
         
         if dataframes is None or dataframes.empty:
-            raise Exception("No data extracted from CSV files")
+            print("No data extracted from CSV files")
+            return None
         
         print(f"Successfully extracted data from {len(dataframes)} CSV files")
         return dataframes
-        
     except Exception as e:
         print(f"Error in extract task: {str(e)}")
         raise
@@ -66,7 +67,7 @@ def transform_task(**context):
         # Get the dataframe from the previous task
         df = context['task_instance'].xcom_pull(task_ids='extract_data')
         
-        if df is None:
+        if df is None or df.empty:
             print("No data to transform")
             return None
         
@@ -86,7 +87,7 @@ def load_task(**context):
         # Get the transformed dataframe from the previous task
         df = context['task_instance'].xcom_pull(task_ids='transform_data')
         
-        if df is None:
+        if df is None or df.empty:
             print("No data to load")
             return
         
@@ -104,6 +105,37 @@ def load_task(**context):
         
     except Exception as e:
         print(f"Error in load task: {str(e)}")
+        raise
+
+def move_to_processed_task():
+    """Move CSV files from data directory to processed directory"""
+    try:
+        # Create processed directory if it doesn't exist
+        os.makedirs(processed_dir, exist_ok=True)
+        
+        # Find all CSV files in data directory
+        csv_pattern = os.path.join(data_dir, '*.csv')
+        csv_files = glob.glob(csv_pattern)
+        
+        if not csv_files:
+            print(f"No CSV files found in {data_dir}. Skipping move operation.")
+            return
+        
+        print(f"Found {len(csv_files)} CSV file(s) to move")
+        
+        # Move each CSV file to processed directory
+        moved_count = 0
+        for csv_file in csv_files:
+            filename = os.path.basename(csv_file)
+            dest_path = os.path.join(processed_dir, filename)
+            shutil.move(csv_file, dest_path)
+            moved_count += 1
+            print(f"Moved {filename} to {processed_dir}")
+        
+        print(f"Successfully moved {moved_count} CSV file(s) to {processed_dir}")
+        
+    except Exception as e:
+        print(f"Error moving files to processed directory: {str(e)}")
         raise
 
 # Define tasks
@@ -131,9 +163,9 @@ load_data = PythonOperator(
     dag=dag,
 )
 
-move_to_processed = BashOperator(
+move_to_processed = PythonOperator(
     task_id='move_to_processed',
-    bash_command=f'mv {data_dir}/*.csv {processed_dir}',
+    python_callable=move_to_processed_task,
     dag=dag,
 )
 

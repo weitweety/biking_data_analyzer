@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import logging
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ def extract_csv_data(file_path: str) -> pd.DataFrame:
         logger.error(f"Error extracting data from {file_path}: {str(e)}")
         raise
 
-def extract_multiple_csvs(directory_path: str) -> List[pd.DataFrame]:
+def extract_multiple_csvs(directory_path: str) -> Optional[pd.DataFrame]:
     """
     Extract data from multiple CSV files in a directory
     
@@ -37,7 +37,7 @@ def extract_multiple_csvs(directory_path: str) -> List[pd.DataFrame]:
         directory_path: Path to directory containing CSV files
         
     Returns:
-        List[pd.DataFrame]: List of extracted dataframes
+        Optional[pd.DataFrame]: Combined dataframe of extracted dataframes
     """
     dataframes = []
     
@@ -49,7 +49,7 @@ def extract_multiple_csvs(directory_path: str) -> List[pd.DataFrame]:
         
         if not csv_files:
             logger.warning(f"No CSV files found in {directory_path}")
-            return dataframes
+            return None
         
         logger.info(f"Found {len(csv_files)} CSV files in {directory_path}")
         
@@ -60,11 +60,12 @@ def extract_multiple_csvs(directory_path: str) -> List[pd.DataFrame]:
 
         combined_df = pd.concat(dataframes) 
         logger.info(f"Successfully extracted data from {len(dataframes)} files")
+        return combined_df
+
     except Exception as e:
         logger.error(f"Error extracting multiple CSV files: {str(e)}")
         raise
-    finally:
-        return combined_df
+        
 
 def validate_dataframe(df: pd.DataFrame, required_columns: List[str]) -> bool:
     """

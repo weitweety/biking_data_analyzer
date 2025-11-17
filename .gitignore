@@ -1,4 +1,4 @@
-airflow/logs/*
+biking-backend/airflow/logs/*
 biking-backend/data/*
 biking-backend/processed/*
 

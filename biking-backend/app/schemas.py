@@ -38,5 +38,9 @@ class TopNResponse(BaseModel):
     count: int
 
 class TripDurationStatsResponse(BaseModel):
-    hours: List[float]
+    hours: List[int]
+    count: List[int]
+
+class TripHourRangeStatsResponse(BaseModel):
+    hour_bucket: List[int]
     count: List[int]

@@ -35,6 +35,17 @@ async def get_summary(db: Session = Depends(get_db)):
         logger.error(f"Error getting summary: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to get summary statistics")
 
+@app.get("/hour-range-stats", response_model=schemas.TripHourRangeStatsResponse)
+async def get_trip_duration_stats(db: Session = Depends(get_db)):
+    """Get trip hour range statistics"""
+    try:
+        stats = crud.get_trip_hourrange_stats(db)
+        return schemas.TripHourRangeStatsResponse(**stats)
+    except Exception as e:
+        logger.error(f"Error getting hour range statistics: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get trip hour range statistics")
+
+
 @app.get("/trip-duration-stats", response_model=schemas.TripDurationStatsResponse)
 async def get_trip_duration_stats(db: Session = Depends(get_db)):
     """Get trip duration statistics"""

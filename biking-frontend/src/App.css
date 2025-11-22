@@ -1,18 +1,12 @@
 .App {
   width: 100%;
   min-height: 100vh;
-  padding: 20px;
   box-sizing: border-box;
-}
-
-.App-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.App-header h1 {
+  background-color: #000000;
+  color: #ffffff;
   margin: 0;
-  color: #646cff;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 main {
@@ -22,5 +16,8 @@ main {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #000000;
 }
 

@@ -1,15 +1,19 @@
-import { useState } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import NavigationBar from './components/NavigationBar'
 import TripDurationChart from './components/TripDurationChart'
+import TripHourRangeChart from './components/TripHourRangeChart'
 import './App.css'
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>Biking Data Analyzer</h1>
-      </header>
+      <NavigationBar />
       <main>
-        <TripDurationChart />
+        <Routes>
+          <Route path="/" element={<Navigate to="/trip-duration" replace />} />
+          <Route path="/trip-duration" element={<TripDurationChart />} />
+          <Route path="/hour-range" element={<TripHourRangeChart />} />
+        </Routes>
       </main>
     </div>
   )

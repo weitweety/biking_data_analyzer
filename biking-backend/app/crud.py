@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc, select
+from sqlalchemy import func, desc, select, case
 import models, schemas
 from typing import List, Optional
 
@@ -93,22 +93,67 @@ def get_trip_hourrange_stats(db: Session):
 
 def get_trip_duration_stats(db: Session):
     """Get trip duration statistics"""
+    hours = models.BikeTrip.tripduration / 3600.0
+
+    bin_label = case(
+        # 0–2 hours → 30-min bins (0.25 h)
+        (hours < 0.5, "< 30 minutes"),
+        (hours < 1, "30 minutes - 1 hour"),
+        (hours < 1.5, "1-1.5 hours"),
+        (hours < 2, "1.5-2 hours"),
+
+        # 2–6 hours → 1-hour bins
+        (hours < 3, "2-3 hours"),
+        (hours < 4, "3-4 hours"),
+        (hours < 5, "4-5 hours"),
+        (hours < 6, "5-6 hours"),
+
+        # 6–24 hours → 6-hour bins
+        (hours < 12, "6-12 hours"),
+        (hours < 18, "12-18 hours"),
+        (hours < 24, "18-24 hours"),
+
+        # 1–3 days → 1-day bins
+        (hours < 48, "1-2 days"),
+        (hours < 72, "2-3 days"),
+
+        else_=">= 3 days"
+    ).label("duration_bin")
+
     stmt = (
         select(
-            (models.BikeTrip.tripduration // 3600).label("hours"),
+            bin_label,
             func.count().label("count")
-        ).group_by(
-            "hours"
-        ).order_by(
-            "hours"
         )
+        .group_by(bin_label)
     )
 
     rows = db.execute(stmt).all()
 
+    # Define the order based on case statement order (logical duration order)
+    bin_order = {
+        "< 30 minutes": 0,
+        "30 minutes - 1 hour": 1,
+        "1-1.5 hours": 2,
+        "1.5-2 hours": 3,
+        "2-3 hours": 4,
+        "3-4 hours": 5,
+        "4-5 hours": 6,
+        "5-6 hours": 7,
+        "6-12 hours": 8,
+        "12-18 hours": 9,
+        "18-24 hours": 10,
+        "1-2 days": 11,
+        "2-3 days": 12,
+        ">= 3 days": 13
+    }
+
+    # Sort by the case statement order
+    sorted_rows = sorted(rows, key=lambda row: bin_order.get(row.duration_bin, 999))
+
     return {
-        "hours": [row.hours for row in rows],
-        "count": [row.count for row in rows]
+        "hours": [row.duration_bin for row in sorted_rows],
+        "count": [row.count for row in sorted_rows]
     }
 
 def delete_all_records(db: Session):

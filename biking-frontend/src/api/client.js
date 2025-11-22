@@ -21,5 +21,15 @@ export const getTripDurationStats = async () => {
   }
 };
 
+export const getTripHourRangeStats = async () => {
+  try {
+    const response = await apiClient.get('/hour-range-stats');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching trip hour range stats:', error);
+    throw error;
+  }
+};
+
 export default apiClient;
 

@@ -34,20 +34,20 @@ const TripDurationChart = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading trip duration statistics...</div>;
+    return <div style={{ color: '#ffffff', padding: '20px' }}>Loading trip duration statistics...</div>;
   }
 
   if (error) {
-    return <div style={{ color: 'red' }}>Error: {error}</div>;
+    return <div style={{ color: 'red', padding: '20px' }}>Error: {error}</div>;
   }
 
   if (!data || data.length === 0) {
-    return <div>No data available</div>;
+    return <div style={{ color: '#ffffff', padding: '20px' }}>No data available</div>;
   }
 
   return (
-    <div style={{ width: '100%', height: '500px', padding: '20px' }}>
-      <h2>Trip Duration Statistics</h2>
+    <div style={{ width: '100%', height: '500px', padding: '20px', backgroundColor: '#000000', boxSizing: 'border-box' }}>
+      <h2 style={{ color: '#ffffff' }}>Trip Duration Statistics</h2>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={data}
@@ -58,16 +58,22 @@ const TripDurationChart = () => {
             bottom: 5,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#333333" />
           <XAxis 
             dataKey="hour" 
             label={{ value: 'Hours', position: 'insideBottom', offset: -5 }}
+            stroke="#ffffff"
+            tick={{ fill: '#ffffff' }}
           />
           <YAxis 
             label={{ value: 'Count', angle: -90, position: 'insideLeft' }}
+            stroke="#ffffff"
+            tick={{ fill: '#ffffff' }}
           />
-          <Tooltip />
-          <Legend />
+          <Tooltip 
+            contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333333', color: '#ffffff' }}
+          />
+          <Legend wrapperStyle={{ color: '#ffffff' }} />
           <Line 
             type="monotone" 
             dataKey="count" 

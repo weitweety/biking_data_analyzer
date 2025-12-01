@@ -11,20 +11,12 @@ def create_record(db: Session, record: schemas.BikeTripCreate):
     db.refresh(db_record)
     return db_record
 
-def get_record(db: Session, record_id: int):
-    """Get a single record by ID"""
-    return db.query(models.BikeTrip).filter(models.BikeTrip.id == record_id).first()
-
-def get_records(db: Session, skip: int = 0, limit: int = 100):
-    """Get multiple records with pagination"""
-    return db.query(models.BikeTrip).offset(skip).limit(limit).all()
-
 def get_top_records(db: Session, n: int = 10):
-    """Get top N records by value"""
-    return db.query(models.BikeTrip).order_by(desc(models.BikeTrip.start_time)).limit(n).all()
+    """Get top N records ordered by start time"""
+    return db.query(models.BikeTrip).order_by(models.BikeTrip.start_time).limit(n).all()
 
-def get_summary_stats(db: Session):
-    """Get summary statistics"""
+def get_count_stats(db: Session):
+    """Get count statistics"""
     total_records = db.query(models.BikeTrip).count()
     
     return {

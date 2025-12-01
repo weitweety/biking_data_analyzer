@@ -10,7 +10,7 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./biking-backend/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - dataflowhub_network
     healthcheck:
@@ -42,14 +42,14 @@ services:
       AIRFLOW_UID: "50000"
       AIRFLOW_GID: "0"
     volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/logs:/opt/airflow/logs
-      - ./airflow/plugins:/opt/airflow/plugins
-      - ./airflow/config:/opt/airflow/config
-      - ./etl:/opt/airflow/etl
-      - ./app:/opt/airflow/app
-      - ./data:/opt/airflow/data
-      - ./processed:/opt/airflow/processed
+      - ./biking-backend/airflow/dags:/opt/airflow/dags
+      - ./biking-backend/airflow/logs:/opt/airflow/logs
+      - ./biking-backend/airflow/plugins:/opt/airflow/plugins
+      - ./biking-backend/airflow/config:/opt/airflow/config
+      - ./biking-backend/etl:/opt/airflow/etl
+      - ./biking-backend/app:/opt/airflow/app
+      - ./biking-backend/data:/opt/airflow/data
+      - ./biking-backend/processed:/opt/airflow/processed
     depends_on:
       postgres:
         condition: service_healthy
@@ -77,14 +77,14 @@ services:
       AIRFLOW_UID: "50000"
       AIRFLOW_GID: "0"
     volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/logs:/opt/airflow/logs
-      - ./airflow/plugins:/opt/airflow/plugins
-      - ./airflow/config:/opt/airflow/config
-      - ./etl:/opt/airflow/etl
-      - ./app:/opt/airflow/app
-      - ./data:/opt/airflow/data
-      - ./processed:/opt/airflow/processed
+      - ./biking-backend/airflow/dags:/opt/airflow/dags
+      - ./biking-backend/airflow/logs:/opt/airflow/logs
+      - ./biking-backend/airflow/plugins:/opt/airflow/plugins
+      - ./biking-backend/airflow/config:/opt/airflow/config
+      - ./biking-backend/etl:/opt/airflow/etl
+      - ./biking-backend/app:/opt/airflow/app
+      - ./biking-backend/data:/opt/airflow/data
+      - ./biking-backend/processed:/opt/airflow/processed
     depends_on:
       - airflow-init
     networks:
@@ -107,14 +107,14 @@ services:
       AIRFLOW_UID: "50000"
       AIRFLOW_GID: "0"
     volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/logs:/opt/airflow/logs
-      - ./airflow/plugins:/opt/airflow/plugins
-      - ./airflow/config:/opt/airflow/config
-      - ./etl:/opt/airflow/etl
-      - ./app:/opt/airflow/app
-      - ./data:/opt/airflow/data
-      - ./processed:/opt/airflow/processed
+      - ./biking-backend/airflow/dags:/opt/airflow/dags
+      - ./biking-backend/airflow/logs:/opt/airflow/logs
+      - ./biking-backend/airflow/plugins:/opt/airflow/plugins
+      - ./biking-backend/airflow/config:/opt/airflow/config
+      - ./biking-backend/etl:/opt/airflow/etl
+      - ./biking-backend/app:/opt/airflow/app
+      - ./biking-backend/data:/opt/airflow/data
+      - ./biking-backend/processed:/opt/airflow/processed
     depends_on:
       - airflow-init
     networks:
@@ -140,12 +140,12 @@ services:
     networks:
       - dataflowhub_network
     volumes:
-      - ./app:/app
-      - ./etl:/etl
+      - ./biking-backend/app:/app
+      - ./biking-backend/etl:/etl
 
   frontend:
     build:
-      context: ../biking-frontend
+      context: ./biking-frontend
       dockerfile: Dockerfile
     container_name: dataflowhub_frontend
     ports:
@@ -161,3 +161,4 @@ volumes:
 networks:
   dataflowhub_network:
     driver: bridge
+

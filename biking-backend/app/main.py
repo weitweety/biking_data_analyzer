@@ -25,15 +25,15 @@ async def ping():
     """Health check endpoint"""
     return {"status": "healthy", "message": "Data Flow Hub API is running"}
 
-@app.get("/summary", response_model=schemas.SummaryResponse)
-async def get_summary(db: Session = Depends(get_db)):
-    """Get summary statistics of the data"""
+@app.get("/count", response_model=schemas.CountResponse)
+async def get_count(db: Session = Depends(get_db)):
+    """Get count statistics of the data"""
     try:
-        stats = crud.get_summary_stats(db)
-        return schemas.SummaryResponse(**stats)
+        stats = crud.get_count_stats(db)
+        return schemas.CountResponse(**stats)
     except Exception as e:
-        logger.error(f"Error getting summary: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to get summary statistics")
+        logger.error(f"Error getting count: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get count statistics")
 
 @app.get("/hour-range-stats", response_model=schemas.TripHourRangeStatsResponse)
 async def get_hour_range_stats(db: Session = Depends(get_db)):
@@ -71,7 +71,7 @@ async def refresh_data():
 
 @app.get("/top/{n}", response_model=schemas.TopNResponse)
 async def get_top_n(n: int, db: Session = Depends(get_db)):
-    """Get top N records by value"""
+    """Get top N records ordered by start time"""
     if n <= 0:
         raise HTTPException(status_code=400, detail="N must be a positive integer")
     
@@ -84,19 +84,6 @@ async def get_top_n(n: int, db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Error getting top {n} records: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to get top records")
-
-@app.get("/records", response_model=List[schemas.BikeTrip])
-async def get_records(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    """Get all records with pagination"""
-    if limit > 1000:
-        limit = 1000
-    
-    try:
-        records = crud.get_records(db, skip=skip, limit=limit)
-        return records
-    except Exception as e:
-        logger.error(f"Error getting records: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to get records")
 
 @app.get("/health/airflow")
 async def check_airflow():

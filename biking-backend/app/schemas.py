@@ -30,7 +30,7 @@ class BikeTrip(BikeTripBase):
     class Config:
         from_attributes = True
 
-class SummaryResponse(BaseModel):
+class CountResponse(BaseModel):
     total_records: int
 
 class TopNResponse(BaseModel):

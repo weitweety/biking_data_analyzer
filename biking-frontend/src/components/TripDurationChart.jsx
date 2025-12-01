@@ -52,28 +52,32 @@ const TripDurationChart = () => {
         <LineChart
           data={data}
           margin={{
-            top: 5,
+            top: 30,
             right: 30,
-            left: 20,
-            bottom: 5,
+            left: 30,
+            bottom: 20,
           }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#333333" />
           <XAxis 
             dataKey="hour" 
-            label={{ value: 'Hours', position: 'insideBottom', offset: -5 }}
+            label={{ value: 'Hours', position: 'insideBottom', offset: -20 }}
             stroke="#ffffff"
             tick={{ fill: '#ffffff' }}
           />
           <YAxis 
-            label={{ value: 'Count', angle: -90, position: 'insideLeft' }}
+            label={{ value: 'Count', angle: -90, position: 'insideLeft', offset: -20 }}
             stroke="#ffffff"
             tick={{ fill: '#ffffff' }}
           />
           <Tooltip 
             contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333333', color: '#ffffff' }}
           />
-          <Legend wrapperStyle={{ color: '#ffffff' }} />
+          <Legend 
+            wrapperStyle={{ color: '#ffffff' }} 
+            verticalAlign="top"
+            align="right"
+          />
           <Line 
             type="monotone" 
             dataKey="count" 

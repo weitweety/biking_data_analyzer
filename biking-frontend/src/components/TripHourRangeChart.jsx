@@ -62,9 +62,10 @@ const TripHourRangeChart = () => {
             label={{ value: 'Hour of Day', position: 'insideBottom', offset: -10 }}
             stroke="#ffffff"
             tick={{ fill: '#ffffff' }}
+            interval={0}
           />
           <YAxis 
-            label={{ value: 'Trip Count', angle: -90, position: 'insideLeft' }}
+            label={{ value: 'Trip Count', angle: -90, position: 'insideLeft', offset: -10 }}
             stroke="#ffffff"
             tick={{ fill: '#ffffff' }}
           />

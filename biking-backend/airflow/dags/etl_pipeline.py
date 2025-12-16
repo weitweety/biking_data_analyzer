@@ -15,9 +15,8 @@ from etl.transform import transform_dataframe
 from etl.load import load_to_database, validate_database_connection
 
 # Default arguments for the DAG
+# API: https://airflow.apache.org/docs/apache-airflow/1.10.3/_api/airflow/models/index.html
 default_args = {
-    'owner': 'dataflowhub',
-    'depends_on_past': False,
     'start_date': datetime(2024, 1, 1),
     'email_on_failure': False,
     'email_on_retry': False,
@@ -29,10 +28,9 @@ default_args = {
 dag = DAG(
     'etl_pipeline',
     default_args=default_args,
-    description='ETL Pipeline for Data Flow Hub',
+    description='ETL Pipeline for Biking Data Flow Hub',
     schedule_interval=timedelta(hours=1),  # Run every hour
-    catchup=False,
-    tags=['etl', 'dataflowhub'],
+    catchup=False # No need to run missed executions between start_date to latest scheduled run, only pick up latest run
 )
 
 # Define the data directory path

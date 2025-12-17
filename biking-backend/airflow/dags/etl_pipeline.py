@@ -29,7 +29,7 @@ dag = DAG(
     'etl_pipeline',
     default_args=default_args,
     description='ETL Pipeline for Biking Data Flow Hub',
-    schedule_interval=timedelta(hours=1),  # Run every hour
+    schedule=timedelta(hours=1),  # Run every hour
     catchup=False # No need to run missed executions between start_date to latest scheduled run, only pick up latest run
 )
 
